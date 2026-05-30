@@ -2,3 +2,4 @@ Flask==3.0.3
 feedparser
 google-generativeai
 python-dotenv
+gunicorn
