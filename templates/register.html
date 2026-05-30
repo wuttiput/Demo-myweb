@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto w-full">
+    <!-- กล่องฟอร์มสมัครสมาชิกแบบกระจก (Glassmorphism card) -->
+    <div class="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-8 shadow-2xl backdrop-blur-md">
+        
+        <!-- ส่วนหัวข้อ -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">สร้างบัญชีใหม่</h1>
+            <p class="text-slate-400 text-sm mt-2">สมัครสมาชิกเพื่อเข้าใช้งานระบบบันทึกการเงิน</p>
+        </div>
+
+        <!-- ฟอร์มสมัครสมาชิก -->
+        <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-5">
+            <div>
+                <label for="username" class="block text-sm font-medium text-slate-300 mb-1.5">ชื่อผู้ใช้งาน (Username)</label>
+                <input type="text" id="username" name="username" required autocomplete="username"
+                       class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
+                       placeholder="ตั้งชื่อผู้ใช้งาน">
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-slate-300 mb-1.5">รหัสผ่าน (Password)</label>
+                <input type="password" id="password" name="password" required autocomplete="new-password"
+                       class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
+                       placeholder="ตั้งรหัสผ่าน">
+            </div>
+
+            <button type="submit" 
+                    class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white font-medium py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20 mt-2 cursor-pointer">
+                สมัครสมาชิก
+            </button>
+        </form>
+
+        <!-- เส้นคั่น -->
+        <div class="relative my-6">
+            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                <div class="w-full border-t border-slate-800/80"></div>
+            </div>
+            <div class="relative flex justify-center text-xs uppercase">
+                <span class="bg-slate-900/0 px-2 text-slate-500">หรือ</span>
+            </div>
+        </div>
+
+        <!-- ลิงก์กลับไปหน้าล็อกอิน -->
+        <div class="text-center">
+            <p class="text-sm text-slate-400">
+                มีบัญชีอยู่แล้วใช่หรือไม่? 
+                <a href="{{ url_for('auth.login') }}" class="text-indigo-400 hover:text-indigo-300 font-medium transition ml-1">เข้าสู่ระบบที่นี่</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

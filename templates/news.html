@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% block title %}ข่าวสารเทคโนโลยี & AI{% endblock %}
+
+{% block content %}
+<div class="space-y-6 w-full pb-10">
+
+    <!-- ส่วนหัว (Header) -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-800/60 pb-6">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-violet-400 to-indigo-300 bg-clip-text text-transparent flex items-center gap-2">
+                <svg class="w-8 h-8 text-violet-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18c0 .621-.504 1.125-1.125 1.125H5.625M9 6h9.75m-15 0h.008v.008H3.75V6zm.008 4.5H3.75v.008h.008V10.5zm-.008 4.5H3.75v.008h.008V15z"/>
+                </svg>
+                ข่าวสารเทคโนโลยี & AI
+            </h1>
+            <p class="text-slate-400 text-xs mt-1">คัดเฉพาะข่าว AI และเทคโนโลยี สรุปสั้นพิเศษภาษาไทยโดย AI Agent</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <span class="text-xs text-slate-500 bg-slate-900/60 border border-slate-800/80 px-3 py-1.5 rounded-lg">
+                อัปเดตล่าสุด: <strong class="text-slate-300 font-normal ml-1" id="last-update-time">{{ last_update_time }}</strong>
+            </span>
+
+            <form action="{{ url_for('news.refresh') }}" method="POST" id="refresh-form">
+                <button type="submit" id="refresh-btn" class="text-xs font-semibold px-4 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white cursor-pointer shadow-lg hover:shadow-violet-900/20 active:translate-y-0.5 transition flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" id="refresh-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                    </svg>
+                    <span>อัปเดตข่าว</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- แถบเตือนกำลังอัปเดตเบื้องหลัง (Background Updating Banner) -->
+    <div id="updating-banner" class="{% if not is_updating %}hidden{% endif %} bg-indigo-950/20 border border-indigo-500/20 rounded-xl p-4 flex items-center justify-between animate-pulse">
+        <div class="flex items-center space-x-3">
+            <div class="h-2 w-2 rounded-full bg-indigo-400 animate-ping"></div>
+            <div class="flex items-center gap-2">
+                <svg class="animate-spin h-4 w-4 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-xs font-medium text-indigo-300">AI Agent กำลังดึงและวิเคราะห์ข่าวสารใหม่ในพื้นหลัง...</span>
+            </div>
+        </div>
+        <span class="text-[10px] text-slate-500">ระบบจะไม่โหลดหน้าจอช้า คุณสามารถอ่านข่าวด้านล่างรอได้</span>
+    </div>
+
+    <!-- แบนเนอร์ไม่มี API Key (Notice Banner) -->
+    {% if not has_api_key %}
+    <div class="bg-amber-950/20 border border-amber-500/20 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="flex items-start space-x-3">
+            <div class="p-1 bg-amber-500/10 rounded-lg text-amber-400 shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-amber-300">ระบบสรุปข่าวโดย AI ยังไม่เปิดใช้งาน</h3>
+                <p class="text-xs text-slate-400 mt-0.5">กรุณาตั้งค่า <code>GEMINI_API_KEY</code> ในไฟล์ <code>.env</code> ของโปรเจกต์ เพื่อดึงประสิทธิภาพเต็มระบบ ให้ AI แปลและสรุปข่าวย่อสั้นกระชับภาษาไทย ปัจจุบันกำลังทำงานในโหมดสำรอง (Fallback) โดยดึงข่าวภาษาอังกฤษและใช้ตัวกรองคำธรรมดา</p>
+            </div>
+        </div>
+        <a href="https://aistudio.google.com/" target="_blank" class="text-xs font-medium text-amber-400 hover:text-amber-300 transition shrink-0 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-lg">
+            รับ API Key ฟรี &rarr;
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- รายการข่าวสาร (News Feed Grid) -->
+    {% if news_list %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {% for news in news_list %}
+        <div class="bg-slate-900/40 border border-slate-800/80 hover:border-violet-500/30 rounded-2xl p-5 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-violet-950/10 flex flex-col justify-between">
+            <div class="space-y-3.5">
+                <!-- แหล่งข่าวและหมวดหมู่ -->
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-semibold text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 uppercase">
+                        {{ news.source }}
+                    </span>
+                    
+                    {% if news.category == 'AI' %}
+                    <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+                        AI
+                    </span>
+                    {% else %}
+                    <span class="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">
+                        TECH
+                    </span>
+                    {% endif %}
+                </div>
+
+                <!-- หัวข้อข่าว -->
+                <h3 class="text-sm font-semibold text-slate-100 hover:text-violet-400 transition leading-snug">
+                    <a href="{{ news.url }}" target="_blank" class="block">
+                        {{ news.title }}
+                    </a>
+                </h3>
+
+                <!-- บทสรุปข่าว -->
+                <div class="text-xs leading-relaxed text-slate-300 bg-slate-950/40 p-3 rounded-xl border border-slate-800/50">
+                    {% if has_api_key %}
+                        {{ news.summary }}
+                    {% else %}
+                        <span class="text-slate-400 block mb-1 font-mono text-[10px] uppercase tracking-wide">&bull; ข่าวต้นฉบับภาษาอังกฤษ (โหมดสำรอง):</span>
+                        <span class="text-slate-300 text-[11px] leading-relaxed">{{ news.summary }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- เมตาดาต้าและปุ่มอ่านข่าวเต็ม -->
+            <div class="flex items-center justify-between border-t border-slate-800/60 mt-4 pt-3.5">
+                <span class="text-[10px] text-slate-500">
+                    {{ news.published_date }}
+                </span>
+                <a href="{{ news.url }}" target="_blank" class="text-[10px] font-semibold text-violet-400 hover:text-violet-300 transition flex items-center gap-1 group">
+                    อ่านข่าวเต็ม 
+                    <svg class="w-3 h-3 group-hover:translate-x-0.5 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-slate-900/20 border border-slate-800/60 rounded-2xl p-12 text-center space-y-3 max-w-md mx-auto mt-10">
+        <div class="h-12 w-12 rounded-2xl bg-slate-850 flex items-center justify-center text-slate-600 mx-auto">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18c0 .621-.504 1.125-1.125 1.125H5.625M9 6h9.75m-15 0h.008v.008H3.75V6zm.008 4.5H3.75v.008h.008V10.5zm-.008 4.5H3.75v.008h.008V15z"/>
+            </svg>
+        </div>
+        <h3 class="text-sm font-semibold text-slate-300">ไม่มีข้อมูลข่าวสารในขณะนี้</h3>
+        <p class="text-xs text-slate-500">กรุณากดปุ่ม <strong>"อัปเดตข่าว"</strong> ด้านขวาบนเพื่อสั่งเริ่มดึงและวิเคราะห์ข่าวสารใหม่เป็นครั้งแรก</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- แจ้งเตือน Toast โหลดข่าวเสร็จสิ้น (Toast Notification Container) -->
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 pointer-events-none"></div>
+
+<!-- JavaScript Polling เช็คความเคลื่อนไหวการดึงข่าวเบื้องหลัง -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const banner = document.getElementById("updating-banner");
+    const refreshBtn = document.getElementById("refresh-btn");
+    const refreshIcon = document.getElementById("refresh-icon");
+    const toastContainer = document.getElementById("toast-container");
+    
+    let isPolling = {% if is_updating %}true{% else %}false{% endif %};
+    let pollInterval = null;
+
+    // ถ้าเปิดหน้าจอมาแล้วระบบกำลังอัปเดตอยู่ ให้เข้าสู่กระบวนการ Poll
+    if (isPolling) {
+        disableRefreshBtn();
+        startPolling();
+    }
+
+    // ฟังก์ชันช่วยปิดปุ่ม Refresh ระหว่างดึงข่าว
+    function disableRefreshBtn() {
+        if (refreshBtn) {
+            refreshBtn.disabled = true;
+            refreshIcon.classList.add("animate-spin");
+        }
+    }
+
+    // ฟังก์ชันช่วยเปิดปุ่ม Refresh
+    function enableRefreshBtn() {
+        if (refreshBtn) {
+            refreshBtn.disabled = false;
+            refreshIcon.classList.remove("animate-spin");
+        }
+    }
+
+    // เริ่มทำการ Poll ยิงเช็คสถานะฐานข้อมูลเบื้องหลัง
+    function startPolling() {
+        if (pollInterval) clearInterval(pollInterval);
+        
+        pollInterval = setInterval(function() {
+            fetch("{{ url_for('news.status') }}")
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.is_updating) {
+                        // ดึงเสร็จสิ้นแล้ว!
+                        clearInterval(pollInterval);
+                        isPolling = false;
+                        enableRefreshBtn();
+                        if (banner) banner.classList.add("hidden");
+                        showToast();
+                    }
+                })
+                .catch(err => {
+                    console.error("Error polling news status:", err);
+                });
+        }, 5000); // เช็คทุก 5 วินาที
+    }
+
+    // แสดงแจ้งเตือน Toast เมื่อโหลดเสร็จ
+    function showToast() {
+        // เคลียร์อันเก่าออกก่อน
+        toastContainer.innerHTML = "";
+        
+        const toast = document.createElement("div");
+        toast.className = "pointer-events-auto bg-slate-900/90 border border-violet-500/40 text-slate-100 p-4 rounded-2xl shadow-2xl backdrop-blur-md flex items-center justify-between gap-4 max-w-sm transition-all duration-500 transform translate-y-10 opacity-0";
+        toast.innerHTML = `
+            <div class="flex items-center space-x-2.5">
+                <div class="h-8 w-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="text-xs font-semibold text-violet-300">ดึงข่าวสารใหม่เสร็จสิ้น!</h4>
+                    <p class="text-[10px] text-slate-400 mt-0.5">ระบบวิเคราะห์สรุปข่าวใหม่เรียบร้อยแล้ว</p>
+                </div>
+            </div>
+            <button onclick="window.location.reload()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white cursor-pointer active:translate-y-0.5 transition shrink-0">
+                รีเฟรชหน้า
+            </button>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        // อนิเมชั่นเลื่อนขึ้นมา
+        setTimeout(() => {
+            toast.classList.remove("translate-y-10", "opacity-0");
+        }, 100);
+    }
+});
+</script>
+{% endblock %}

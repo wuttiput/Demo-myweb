@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Dashboard{% endblock %} — Personal Hub</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Kanit', sans-serif; }
+    </style>
+</head>
+<body class="min-h-full bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- ===== NAVBAR (แสดงเฉพาะเมื่อ login อยู่) ===== -->
+    {% if session.get('username') %}
+    <nav class="w-full bg-slate-900/60 border-b border-slate-800/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- Logo / Brand -->
+            <a href="{{ url_for('home.index') }}" class="flex items-center space-x-2 group">
+                <div class="h-7 w-7 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">P</div>
+                <span class="text-sm font-semibold text-slate-200 group-hover:text-white transition">Personal Hub</span>
+            </a>
+
+            <!-- Nav Links -->
+            <div class="hidden sm:flex items-center space-x-1">
+                <a href="{{ url_for('home.index') }}"
+                   class="text-xs font-medium px-3 py-1.5 rounded-lg transition
+                          {% if request.endpoint and request.endpoint.startswith('home.') %}bg-slate-800 text-white{% else %}text-slate-400 hover:text-white hover:bg-slate-800/60{% endif %}">
+                    หน้าหลัก
+                </a>
+                <a href="{{ url_for('finance.dashboard') }}"
+                   class="text-xs font-medium px-3 py-1.5 rounded-lg transition
+                          {% if request.endpoint and request.endpoint.startswith('finance.') %}bg-slate-800 text-white{% else %}text-slate-400 hover:text-white hover:bg-slate-800/60{% endif %}">
+                    รายรับ-รายจ่าย
+                </a>
+                <a href="{{ url_for('todo.index') }}"
+                   class="text-xs font-medium px-3 py-1.5 rounded-lg transition
+                          {% if request.endpoint and request.endpoint.startswith('todo.') %}bg-slate-800 text-white{% else %}text-slate-400 hover:text-white hover:bg-slate-800/60{% endif %}">
+                    To-Do List
+                </a>
+                <a href="{{ url_for('news.index') }}"
+                   class="text-xs font-medium px-3 py-1.5 rounded-lg transition
+                          {% if request.endpoint and request.endpoint.startswith('news.') %}bg-slate-800 text-white{% else %}text-slate-400 hover:text-white hover:bg-slate-800/60{% endif %}">
+                    ข่าวสาร AI & Tech
+                </a>
+                <a href="{{ url_for('chat.index') }}"
+                   class="text-xs font-medium px-3 py-1.5 rounded-lg transition
+                          {% if request.endpoint and request.endpoint.startswith('chat.') %}bg-slate-800 text-white{% else %}text-slate-400 hover:text-white hover:bg-slate-800/60{% endif %}">
+                    แชทอัจฉริยะ
+                </a>
+            </div>
+
+            <!-- User + Logout -->
+            <div class="flex items-center space-x-3">
+                <div class="hidden sm:flex items-center space-x-2">
+                    <div class="h-6 w-6 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+                        {{ session['username'][0]|upper }}
+                    </div>
+                    <span class="text-xs text-slate-400">{{ session['username'] }}</span>
+                </div>
+                <a href="{{ url_for('auth.logout') }}" class="text-xs text-slate-500 hover:text-rose-400 transition px-2 py-1.5 rounded-lg hover:bg-rose-500/10">
+                    ออกจากระบบ
+                </a>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Links -->
+        <div class="sm:hidden border-t border-slate-800/60 px-4 py-2 flex space-x-1 overflow-x-auto">
+            <a href="{{ url_for('home.index') }}"
+               class="text-xs font-medium px-3 py-1.5 rounded-lg whitespace-nowrap transition
+                      {% if request.endpoint and request.endpoint.startswith('home.') %}bg-slate-800 text-white{% else %}text-slate-400 hover:text-white{% endif %}">
+                หน้าหลัก
+            </a>
+            <a href="{{ url_for('finance.dashboard') }}"
+               class="text-xs font-medium px-3 py-1.5 rounded-lg whitespace-nowrap transition
+                      {% if request.endpoint and request.endpoint.startswith('finance.') %}bg-slate-800 text-white{% else %}text-slate-400 hover:text-white{% endif %}">
+                รายรับ-รายจ่าย
+            </a>
+            <a href="{{ url_for('todo.index') }}"
+               class="text-xs font-medium px-3 py-1.5 rounded-lg whitespace-nowrap transition
+                      {% if request.endpoint and request.endpoint.startswith('todo.') %}bg-slate-800 text-white{% else %}text-slate-400 hover:text-white{% endif %}">
+                To-Do List
+            </a>
+            <a href="{{ url_for('news.index') }}"
+               class="text-xs font-medium px-3 py-1.5 rounded-lg whitespace-nowrap transition
+                      {% if request.endpoint and request.endpoint.startswith('news.') %}bg-slate-800 text-white{% else %}text-slate-400 hover:text-white{% endif %}">
+                ข่าวสาร AI & Tech
+            </a>
+            <a href="{{ url_for('chat.index') }}"
+               class="text-xs font-medium px-3 py-1.5 rounded-lg whitespace-nowrap transition
+                      {% if request.endpoint and request.endpoint.startswith('chat.') %}bg-slate-800 text-white{% else %}text-slate-400 hover:text-white{% endif %}">
+                แชทอัจฉริยะ
+            </a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4 py-8">
+        <div class="w-full max-w-5xl">
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for category, message in messages %}
+                    <div class="p-4 rounded-xl border flex items-center justify-between
+                                {% if category == 'success' %}bg-emerald-950/30 border-emerald-500/30 text-emerald-400
+                                {% elif category == 'info' %}bg-indigo-950/30 border-indigo-500/30 text-indigo-400
+                                {% elif category == 'warning' %}bg-amber-950/30 border-amber-500/30 text-amber-400
+                                {% else %}bg-rose-950/30 border-rose-500/30 text-rose-400{% endif %}"
+                         role="alert">
+                        <div class="flex items-center space-x-2">
+                            {% if category == 'success' %}
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            {% elif category == 'info' %}
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            {% elif category == 'warning' %}
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            {% else %}
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            {% endif %}
+                            <span class="text-sm font-medium">{{ message }}</span>
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="text-lg font-bold opacity-50 hover:opacity-100 transition p-1">&times;</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="w-full py-4 text-center text-xs text-slate-600 border-t border-slate-900">
+        &copy; 2026 Personal Hub — ระบบจัดการชีวิตส่วนตัว
+    </footer>
+
+</body>
+</html>
